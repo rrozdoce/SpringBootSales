@@ -1,6 +1,20 @@
 package com.rrozdoce.vendas.domain.entity;
 
+import javax.persistence.*;
+
+// mostrar q a entidade é JPA, colocar TABLE se os nomes forem diferentes
+@Entity
+//@Table(name = "tb_cliente", schema = "vendas")
+@Table(name =  "cliente")
 public class Cliente {
+
+    @Id // define a primary key da entidade
+    @GeneratedValue(strategy = GenerationType.AUTO) // AUTO_INCREMENT
+    @Column(name = "id") // fazer as definicoes da coluna, colocar name, SE os nomes nao batarem com o banco
+    private Integer id;
+
+    @Column(name = "nome", length = 100) // pode colocar se ela é unica etc... like that
+    private String nome;
 
     public Cliente() {
     }
@@ -13,9 +27,6 @@ public class Cliente {
     public Cliente(String nome) {
         this.nome = nome;
     }
-
-    private Integer id;
-    private String nome;
 
     public Integer getId() {
         return id;

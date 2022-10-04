@@ -1,78 +1,21 @@
 package com.rrozdoce.vendas.domain.repositorio;
 
 import com.rrozdoce.vendas.domain.entity.Cliente;
-import org.hibernate.procedure.spi.ParameterRegistrationImplementor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-import javax.persistence.EntityManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
-// quando voce anota com @Repository o spring ve que voce vai fazer operacoes na base de dados
-// @Repository tem o diferencial que ele traduz as excecoes que ocorrem no banco
-@Repository
-public class Clientes {
+// O JpaRepository ja tem as operacoes encapsuladas dentro dele
+public interface Clientes extends JpaRepository<Cliente, Integer> {
 
-    private static String INSERT = "INSERT INTO CLIENTE (NOME) VALUES(?) ";
-    private static String SELECT_ALL = "SELECT * FROM CLIENTE ";
-    private static String UPDATE = "UPDATE CLIENTE SET NOME = ? WHERE ID = ? ";
-    private static String DELETE = "DELETE FROM CLIENTE WHERE ID = ? ";
+    // select c from Cliente c where c.nome like :nome => a funcao abaixo
+    List<Cliente> findByNomeLike(String nome); // spring data vai transformar esse metodo em uma query, o 'Like' é igual o like do SQL
 
-    // tem alguns metodos que permitem a gente fazer operacoes na base de dados
-   @Autowired
-   private JdbcTemplate jdbcTemplate;
+    List<Cliente> findByNomeOrId(String nome, Integer id);
 
-   @Autowired
-   private EntityManager entityManager; // é a interface que faz todas as operacoes na base com as entidades
+    // One chama um metodo que retorna apenas um registro, se retornar mais de um registro ele da erro
+    //Cliente findOneByNome(String );
 
-    @Transactional // falar que o metodo vai geral uma transacao na base de dados
-    public Cliente salvar(Cliente cliente) {
-        entityManager.persist(cliente); // entity manager vai reconhecer cada uma das colunas e vai 'persistir'
-        return cliente;
-    }
-
-    public Cliente atualizar(Cliente cliente) {
-        jdbcTemplate.update(UPDATE, new Object[]{
-           cliente.getNome(),
-           cliente.getId()
-        });
-        return cliente;
-    }
-
-    public void deletar(Cliente cliente) {
-       deletar(cliente.getId());
-    }
-
-    public void deletar(Integer id) {
-        jdbcTemplate.update(DELETE, new Object[]{id});
-    }
-    public List<Cliente> buscarPorNome(String nome){
-        return jdbcTemplate.query(
-                SELECT_ALL.concat(" where nome like ? "),
-                obterClienteMapper(),
-                new Object[]{"%" + nome + "%"}
-                );
-    }
-
-    public List<Cliente> obterTodos(){
-        return jdbcTemplate.query(SELECT_ALL, obterClienteMapper());
-    }
-
-    private RowMapper<Cliente> obterClienteMapper() {
-        return new RowMapper<Cliente>() { // RowMapper mapeia o resultado do banco p/ uma classe
-            @Override
-            public Cliente mapRow(ResultSet resultSet, int i) throws SQLException {
-
-                Integer id = resultSet.getInt("id");
-                String nome = resultSet.getString("nome");
-                return new Cliente(id, nome);
-            }
-        };
-    }
+    boolean existsByNome(String nome);
 
 }

@@ -17,7 +17,7 @@ public class Cliente {
     @Column(name = "nome", length = 100) // pode colocar se ela é unica etc... like that
     private String nome;
 
-    @OneToMany(mappedBy = "") // Essa entidade nao tem nenhuma chave p/ os pedidos, quem tem a chave é a tabela de pedidos
+    @OneToMany(mappedBy = "cliente", fetch = FetchType.LAZY) // Essa entidade nao tem nenhuma chave p/ os pedidos, quem tem a chave é a tabela de pedidos
     private Set<Pedido> pedidos; // set evita alguns erros que podem ocorrer no Hibernate, mas voce pode usar Collection, List etc...
 
     public Cliente() {

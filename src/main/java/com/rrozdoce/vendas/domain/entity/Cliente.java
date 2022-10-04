@@ -1,6 +1,7 @@
 package com.rrozdoce.vendas.domain.entity;
 
 import javax.persistence.*;
+import java.util.Set;
 
 // mostrar q a entidade é JPA, colocar TABLE se os nomes forem diferentes
 @Entity
@@ -16,6 +17,9 @@ public class Cliente {
     @Column(name = "nome", length = 100) // pode colocar se ela é unica etc... like that
     private String nome;
 
+    @OneToMany(mappedBy = "") // Essa entidade nao tem nenhuma chave p/ os pedidos, quem tem a chave é a tabela de pedidos
+    private Set<Pedido> pedidos; // set evita alguns erros que podem ocorrer no Hibernate, mas voce pode usar Collection, List etc...
+
     public Cliente() {
     }
 
@@ -26,6 +30,14 @@ public class Cliente {
 
     public Cliente(String nome) {
         this.nome = nome;
+    }
+
+    public Set<Pedido> getPedidos() {
+        return pedidos;
+    }
+
+    public void setPedidos(Set<Pedido> pedidos) {
+        this.pedidos = pedidos;
     }
 
     public Integer getId() {

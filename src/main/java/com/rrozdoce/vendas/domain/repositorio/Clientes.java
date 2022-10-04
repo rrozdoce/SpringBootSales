@@ -2,20 +2,22 @@ package com.rrozdoce.vendas.domain.repositorio;
 
 import com.rrozdoce.vendas.domain.entity.Cliente;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
 // O JpaRepository ja tem as operacoes encapsuladas dentro dele
 public interface Clientes extends JpaRepository<Cliente, Integer> {
 
-    // select c from Cliente c where c.nome like :nome => a funcao abaixo
-    List<Cliente> findByNomeLike(String nome); // spring data vai transformar esse metodo em uma query, o 'Like' é igual o like do SQL
+   @Query(value = " select * from cliente c where c.nome like '%:nome%' ", nativeQuery = true) // " select c from Cliente c where c.nome like :nome " -> HQL, para mudar pra SQL coloque nativeQuery=true
+   List<Cliente> econtrarPorNome(@Param("nome") String nome); // colocar o nome do parametro dentro de @Param para se referir a ':nome'
 
-    List<Cliente> findByNomeOrId(String nome, Integer id);
+   @Query(" delete from Cliente c where c.nome =:nome ")
+   @Modifying // dizer q vai fazer att na tabela, seja ela de deleção ou registro
+   void deleteByNome(String nome);
 
-    // One chama um metodo que retorna apenas um registro, se retornar mais de um registro ele da erro
-    //Cliente findOneByNome(String );
-
-    boolean existsByNome(String nome);
+   boolean existsByNome(String nome);
 
 }
